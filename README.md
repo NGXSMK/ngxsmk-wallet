@@ -49,55 +49,48 @@ Many password managers today force your data into the cloud, while local alterna
 
 ## Features
 
-### Password Management
-- AES-256-GCM encrypted credential storage
-- Categories: password, passkey, secure note, API key, SSH key, database creds, certificates, software licenses, recovery codes, custom
-- Built-in password generator with strength estimation
-- Favorites, folders, and search
+NGXSMK Wallet provides all the standard capabilities of traditional local password managers (like KeePass) out-of-the-box—such as auto-typing, clipboard clearing, and database portability—while adding next-generation features that modern users expect.
 
-### Passkeys & WebAuthn
-- FIDO2/WebAuthn credential management
-- Store and organize passkey metadata
+### 🔐 Next-Gen Password & Secret Management
+- **Military-Grade Security:** AES-256-GCM encryption with Argon2id memory-hard key derivation.
+- **Multiple Entry Types:** Passwords, Secure Notes, API Keys, SSH Keys, Database Credentials, Software Licenses, and custom fields.
+- **Advanced Password Generator:** Cryptographically strong random password generator with customizable character sets and strength estimation.
+- **Organized Vault:** Nested folders, favorites, tagging, and lightning-fast global search (`Ctrl+K`).
+- **Global Auto-Type & Drag-and-Drop:** Seamlessly inject credentials into other applications without revealing them.
 
-### Secure Documents
-- Encrypted file storage with versioning
-- Upload, download, and delete directly in-app
+### 🔑 Passkeys & WebAuthn (FIDO2)
+- Native management of FIDO2/WebAuthn passkeys (no plugins required).
+- Store, view, and organize passkey metadata securely alongside traditional passwords.
 
-### Identity Records
-- Store identity documents: passports, national IDs, driver's licenses, insurance, certificates
-- Categorized and searchable
+### ⏱️ Built-in Authenticator (TOTP)
+- Integrated TOTP (Time-based One-Time Password) management.
+- Live code generation with a visual countdown timer.
+- Easy QR code scanning and setup.
 
-### Multi-Factor Authentication (TOTP)
-- TOTP token management with live code generation & countdown timer
-- QR code setup
+### 📄 Secure Documents & Identity Records
+- **Encrypted File Attachments:** Attach files directly to entries with secure, versioned in-app storage.
+- **Digital Identity Wallet:** Store and categorize Passports, National IDs, Driver's Licenses, and Insurance records.
 
-### Security Dashboard
-- Password strength analysis & scoring
-- Weak, reused, old, and breached credential detection
-- Have I Been Pwned (HIBP) integration for breach checking
-- Actionable recommendations
+### 🛡️ Proactive Security & Dashboard
+- **Breach Monitoring:** Have I Been Pwned (HIBP) API integration to alert you of compromised accounts.
+- **Vault Health Scoring:** Automatic detection of weak, reused, or aging passwords.
+- **Local Secret Scanner:** Built-in scanner to detect accidentally exposed API keys or tokens in your local filesystem or environment variables.
 
-### Local Secret Scanner
-- Scan directories or system environment for exposed credentials
-- Pattern-based detection of API keys, tokens, and secrets
+### 🔄 Backup, Sync & Recovery
+- **No-Hassle Cloud Sync:** Built-in support to securely sync encrypted vaults via Google Drive, Dropbox, or OneDrive (no third-party plugins needed).
+- **Shamir's Secret Sharing:** Split your master recovery key into multiple pieces for secure distributed backup.
+- **Automated Backups:** Scheduled encrypted backups using Zstd compression.
 
-### Backup & Recovery
-- Encrypted backups with AES + Argon2
-- Cloud sync: Google Drive, Dropbox, OneDrive
-- Shamir's Secret Sharing for recovery key splitting
-- Scheduled automatic backups
+### 📥 Seamless Import & Export
+- Import from Bitwarden, 1Password, KeePass (CSV/XML), Google Chrome, and Microsoft Edge.
+- Export your entire vault or specific folders to encrypted JSON or CSV formats.
 
-### Import & Export
-- JSON & CSV export/import
-- Bitwarden format import
-- Chrome & Edge browser password import
-
-### Platform Security
-- Windows Hello biometric unlock
-- Auto-lock on idle timeout
-- Clipboard auto-clearing
-- Anti-devtools detection
-- Strict Content Security Policy
+### 💻 Advanced Platform Security
+- **Biometric Unlock:** Windows Hello, Touch ID, and Linux biometric integration.
+- **Secure Memory:** Cryptographic material is zeroed out upon locking or exiting.
+- **Clipboard Protection:** Secure clipboard handling with auto-clearing after a timeout.
+- **Anti-Tampering:** Anti-devtools detection and Strict Content Security Policy.
+- **Portable Mode:** Run entirely from a USB stick without installation.
 
 ### User Experience
 - Dark, Light, and System themes
