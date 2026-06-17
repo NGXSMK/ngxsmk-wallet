@@ -152,19 +152,17 @@ NGXSMK Wallet provides all the standard capabilities of traditional local passwo
 
 ## Download
 
-> Placeholder — add your download links below once binaries are built.
+You can always find the latest stable version of NGXSMK Wallet for your operating system on our Releases page.
 
-### Latest Release
+[![Download Latest Release](https://img.shields.io/github/v/release/NGXSMK/ngxsmk-wallet?label=Download%20Latest%20Version&style=for-the-badge&color=success)](https://github.com/NGXSMK/ngxsmk-wallet/releases/latest)
 
-| Platform | Installer | Portable |
-|---|---|---|
-| Windows | [Download .msi]() | [Download .exe]() |
-| macOS | [Download .dmg]() | — |
-| Linux | [Download .AppImage]() | [Download .deb]() |
+| Platform | Available Formats |
+|---|---|
+| **Windows** | `.msi`, `.exe` |
+| **macOS** | `.dmg`, `.app` |
+| **Linux** | `.AppImage`, `.deb` |
 
-### All Releases
-
-See the [Releases](https://github.com/NGXSMK/ngxsmk-wallet/releases) page for all versions and changelogs.
+👉 **[View All Releases and Changelogs](https://github.com/NGXSMK/ngxsmk-wallet/releases)**
 
 ---
 
