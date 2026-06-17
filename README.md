@@ -11,10 +11,20 @@
 
 NGXSMK Wallet is an advanced, **zero-knowledge, offline-first secure desktop vault** designed to keep your digital identity, passwords, credentials, secrets, and private documents completely encrypted and under your exclusive control. Built using modern technologies like **Tauri v2**, **Rust**, and **React 19**, it ensures absolute privacy by storing all vault data locally on your device with no cloud dependencies, no telemetry, and no tracking.
 
+## Why Choose NGXSMK Wallet?
+
+Many password managers today force your data into the cloud, while local alternatives often suffer from outdated, clunky interfaces. NGXSMK Wallet brings the best of both worlds:
+- 🚫 **No Forced Cloud & Zero Telemetry**: Unlike Bitwarden or 1Password, your vault is entirely offline. Your data stays on your machine, period.
+- ⚡ **Blazing Fast & Lightweight**: Written in Rust using Tauri, it uses a fraction of the memory that Electron-based apps consume, while delivering a modern, beautiful interface.
+- 🛡️ **More Than Just Passwords**: We go beyond simple logins. Manage your FIDO2 Passkeys, Identity Documents, SSH Keys, and encrypted files all in one secure place.
+- 🔍 **Built-in Local Secret Scanner**: Proactively scan your system and directories to find accidentally exposed credentials or API keys before they become a problem.
+- 💸 **No Subscriptions**: Take back ownership of your digital identity without monthly fees.
+
 ---
 
 ## Table of Contents
 
+- [Why Choose NGXSMK Wallet?](#why-choose-ngxsmk-wallet)
 - [Features](#features)
   - [Password Management](#password-management)
   - [Passkeys & WebAuthn](#passkeys--webauthn)
