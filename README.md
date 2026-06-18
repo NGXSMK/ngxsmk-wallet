@@ -11,6 +11,8 @@
 
 NGXSMK Wallet is an advanced, **zero-knowledge, offline-first secure desktop vault** designed to keep your digital identity, passwords, credentials, secrets, and private documents completely encrypted and under your exclusive control. Built using modern technologies like **Tauri v2**, **Rust**, and **React 19**, it ensures absolute privacy by storing all vault data locally on your device with no cloud dependencies, no telemetry, and no tracking.
 
+![Dashboard](public/2.png)
+
 ## Why Choose NGXSMK Wallet?
 
 Many password managers today force your data into the cloud, while local alternatives often suffer from outdated, clunky interfaces. NGXSMK Wallet brings the best of both worlds:
@@ -58,6 +60,8 @@ NGXSMK Wallet provides all the standard capabilities of traditional local passwo
 - **Organized Vault:** Nested folders, favorites, tagging, and lightning-fast global search (`Ctrl+K`).
 - **Global Auto-Type & Drag-and-Drop:** Seamlessly inject credentials into other applications without revealing them.
 
+![Add Password Modal](public/5.png) ![Sticky Note Section](public/6.png)
+
 ### 🔑 Passkeys & WebAuthn (FIDO2)
 - Native management of FIDO2/WebAuthn passkeys (no plugins required).
 - Store, view, and organize passkey metadata securely alongside traditional passwords.
@@ -91,6 +95,8 @@ NGXSMK Wallet provides all the standard capabilities of traditional local passwo
 - **Clipboard Protection:** Secure clipboard handling with auto-clearing after a timeout.
 - **Anti-Tampering:** Anti-devtools detection and Strict Content Security Policy.
 - **Portable Mode:** Run entirely from a USB stick without installation.
+
+![Master Password Login](public/1.png) ![Locked Vault Blur Panel](public/3.png)
 
 ### User Experience
 - Dark, Light, and System themes
@@ -213,3 +219,5 @@ See [LICENSE](./LICENSE) for full terms.
 ## About NGXSMK
 
 NGXSMK builds privacy-first tools for individuals and organizations who value digital sovereignty. Learn more at [ngxsmk.com](https://ngxsmk.com).
+
+![About & Legal](public/4.png)
