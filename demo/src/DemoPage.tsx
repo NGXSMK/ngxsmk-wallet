@@ -820,7 +820,7 @@ export function DemoApp({ dark, onToggleDark, onBack }: { dark: boolean; onToggl
     <div className="flex h-screen overflow-hidden bg-background">
       <div className="fixed inset-0 bg-gradient-to-br from-primary/3 via-transparent to-blue-500/3 pointer-events-none" />
       {sidebarVisible && (
-        <aside className={`fixed left-0 top-0 h-full z-30 flex flex-col border-r border-border/50 bg-background/80 backdrop-blur-xl transition-[width] duration-300 ${sidebarCollapsed ? "w-16" : "w-60"}`}>
+        <aside aria-label="Sidebar navigation" className={`fixed left-0 top-0 h-full z-30 flex flex-col border-r border-border/50 bg-background/80 backdrop-blur-xl transition-[width] duration-300 ${sidebarCollapsed ? "w-16" : "w-60"}`}>
           <div className="flex items-center h-14 px-3 border-b border-border/50">
             {!sidebarCollapsed ? (
               <div className="flex items-center gap-2.5 overflow-hidden"><div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20 flex items-center justify-center shrink-0"><Wallet className="w-4 h-4 text-primary-foreground" /></div><span className="text-sm font-semibold tracking-tight">NGXSMK</span></div>
@@ -852,13 +852,13 @@ export function DemoApp({ dark, onToggleDark, onBack }: { dark: boolean; onToggl
             ))}
           </div>
           <div className="border-t border-border/50 p-1.5 space-y-0.5">
-            <button className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/50 hover:text-foreground hover:bg-accent/40 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+            <button aria-label={sidebarCollapsed ? "Search" : undefined} className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/50 hover:text-foreground hover:bg-accent/40 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
               <Search className="w-5 h-5 shrink-0" />{!sidebarCollapsed && <><span className="flex-1 text-left">Search</span><kbd className="hidden md:inline-flex items-center gap-1 rounded-md border border-border/40 bg-muted/40 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground/70"><span>⌘</span>K</kbd></>}
             </button>
-            <button className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+            <button aria-label={sidebarCollapsed ? "Lock vault" : undefined} className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
               <Lock className="w-5 h-5 shrink-0" />{!sidebarCollapsed && <span>Lock Vault</span>}
             </button>
-            <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)} aria-label={sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
               className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/40 hover:text-foreground hover:bg-accent/40 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
               {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <><ChevronLeft className="w-5 h-5 shrink-0" /><span>Collapse</span></>}
             </button>
@@ -868,14 +868,14 @@ export function DemoApp({ dark, onToggleDark, onBack }: { dark: boolean; onToggl
       {sidebarVisible && <div style={{ width: sidebarCollapsed ? 64 : 240 }} />}
       <main className="flex-1 overflow-auto relative">
         {sidebarVisible && (
-          <header className="sticky top-0 z-20 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+          <header aria-label="Page header" className="sticky top-0 z-20 border-b border-border/50 bg-background/80 backdrop-blur-xl">
             <div className="flex items-center justify-between h-14 px-6 gap-3">
               <div className="flex items-center gap-3">
-                {onBack && <button onClick={onBack} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"><ArrowLeft className="w-3.5 h-3.5" /> Back to Home</button>}
+                {onBack && <button onClick={onBack} aria-label="Back to landing page" className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"><ArrowLeft className="w-3.5 h-3.5" /> Back to Home</button>}
                 <Badge variant="info" className="gap-1.5 px-3 py-1.5 rounded-lg"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Demo Mode</Badge>
               </div>
               <div className="flex items-center gap-3">
-                <button onClick={onToggleDark} className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</button>
+                <button onClick={onToggleDark} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">{dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}</button>
                 <div className="flex items-center gap-2 pl-2 border-l border-border/50"><div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-xs font-bold text-white">D</div><span className="text-sm font-medium hidden sm:block">Demo User</span></div>
               </div>
             </div>

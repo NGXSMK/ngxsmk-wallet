@@ -55,7 +55,7 @@ function Navbar({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onToggleD
   const border = useTransform(scrollY, [0, 60], ["rgba(255,255,255,0)", "rgba(255,255,255,0.08)"]);
 
   return (
-    <motion.nav style={{ background: bg, borderColor: border }} className="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl transition-colors">
+    <header><motion.nav aria-label="Main navigation" style={{ background: bg, borderColor: border }} className="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-xl transition-colors">
       <div className="mx-auto max-w-7xl flex items-center justify-between h-16 px-4 sm:px-6">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-primary to-purple-600 shadow-lg shadow-primary/25 flex items-center justify-center">
@@ -70,13 +70,13 @@ function Navbar({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onToggleD
           })}
         </div>
         <div className="flex items-center gap-3">
-          <button onClick={onToggleDark} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all">
+          <button onClick={onToggleDark} aria-label={dark ? "Switch to light mode" : "Switch to dark mode"} className="flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all">
             {dark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
           <button onClick={onLaunchDemo} className="hidden sm:inline-flex h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25 transition-all items-center gap-1.5">
             Live Demo <ChevronRight className="w-3.5 h-3.5" />
           </button>
-          <button onClick={() => setOpen(!open)} className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all">
+          <button onClick={() => setOpen(!open)} aria-label={open ? "Close menu" : "Open menu"} className="md:hidden flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-all">
             {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </div>
@@ -90,7 +90,7 @@ function Navbar({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onToggleD
           <button onClick={onLaunchDemo} className="w-full h-10 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-all">Live Demo</button>
         </motion.div>
       )}
-    </motion.nav>
+    </motion.nav></header>
   );
 }
 
@@ -120,11 +120,25 @@ function FeatureCard({ feature, index }: { feature: typeof features[0]; index: n
 
 function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onToggleDark: () => void; onLaunchDemo: () => void }) {
   return (
-    <div className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background">
       <Navbar dark={dark} onToggleDark={onToggleDark} onLaunchDemo={onLaunchDemo} />
 
+      {/* JSON-LD Structured Data */}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{
+        __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          "name": "NGXSMK Wallet",
+          "applicationCategory": "SecurityApplication",
+          "operatingSystem": "Windows, macOS, Linux",
+          "description": "Free, open-source password manager, passkey vault, TOTP authenticator, and secure document storage.",
+          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+          "author": { "@type": "Organization", "name": "NGXSMK", "url": "https://github.com/NGXSMK" },
+        })
+      }} />
+
       {/* Hero */}
-      <section className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-hidden">
+      <section aria-label="Hero" className="relative pt-32 pb-20 sm:pt-40 sm:pb-28 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.03] via-transparent to-transparent pointer-events-none" />
         <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
         <div className="mx-auto max-w-6xl px-4 sm:px-6 relative">
@@ -160,7 +174,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* Stats */}
-      <section className="py-12 border-y border-border/50">
+      <section aria-label="Statistics" className="py-12 border-y border-border/50">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((s, i) => {
@@ -176,7 +190,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* Features */}
-      <section id="features" className="py-20 sm:py-28">
+      <section id="features" aria-label="Features" className="py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHeader title="Everything You Need" subtitle="Passwords, passkeys, documents, 2FA, and more — all secured by military-grade encryption." />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
@@ -186,7 +200,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* How It Works */}
-      <section className="py-20 sm:py-28 bg-muted/30">
+      <section aria-label="How It Works" className="py-20 sm:py-28 bg-muted/30">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHeader title="Get Started in Minutes" subtitle="No accounts, no sign-ups, no data collection. Just download and go." />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -203,7 +217,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* Security */}
-      <section id="security" className="py-20 sm:py-28">
+      <section id="security" aria-label="Security" className="py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHeader title="Built for Security" subtitle="Every layer of NGXSMK Wallet is designed with privacy and security as the foundation." />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -227,7 +241,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 sm:py-28 bg-muted/30">
+      <section aria-label="Testimonials" className="py-20 sm:py-28 bg-muted/30">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHeader title="Trusted by Developers" subtitle="Built by engineers, for engineers." />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -244,7 +258,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* Open Source */}
-      <section id="opensource" className="py-20 sm:py-28">
+      <section id="opensource" aria-label="Open Source" className="py-20 sm:py-28">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <SectionHeader title="Free &amp; Open Source" subtitle="No subscriptions. No hidden costs. No data collection. Just secure, private software for everyone." />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -267,7 +281,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* CTA */}
-      <section className="py-20 sm:py-28 relative overflow-hidden">
+      <section aria-label="Call to Action" className="py-20 sm:py-28 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary/[0.02] via-primary/[0.05] to-primary/[0.02]" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/10 rounded-full blur-3xl pointer-events-none" />
         <div className="mx-auto max-w-4xl px-4 sm:px-6 text-center relative">
@@ -280,7 +294,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
                 className="h-12 px-8 rounded-xl bg-primary text-primary-foreground font-semibold hover:bg-primary/90 shadow-xl shadow-primary/25 transition-all flex items-center gap-2 text-base">
                 <Zap className="w-5 h-5" /> Launch Live Demo
               </motion.button>
-              <motion.a whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} href="#features"
+              <motion.a whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} href="https://github.com/NGXSMK/ngxsmk-wallet/releases" target="_blank" rel="noopener noreferrer"
                 className="h-12 px-8 rounded-xl border border-border bg-background font-medium hover:bg-accent transition-all flex items-center gap-2 text-base">
                 <Download className="w-4 h-4" /> Download App
               </motion.a>
@@ -290,7 +304,7 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 py-12">
+      <footer aria-label="Footer" className="border-t border-border/50 py-12">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
             <div className="col-span-2 md:col-span-1">
@@ -298,24 +312,27 @@ function LandingPage({ dark, onToggleDark, onLaunchDemo }: { dark: boolean; onTo
               <p className="text-xs text-muted-foreground leading-relaxed">Privacy-first, fully local digital identity and secrets management. Built with Rust and React.</p>
             </div>
             {[
-              { title: "Product", links: ["Features", "Security", "FAQ"] },
-              { title: "Resources", links: ["Documentation", "API Reference", "Changelog", "Status"] },
-              { title: "Community", links: ["GitHub", "Discussions", "Contributing", "Code of Conduct"] },
+              { title: "Product", links: ["Features", "Security", "FAQ"], urls: [] },
+              { title: "Resources", links: ["Documentation", "API Reference", "Changelog", "Status"], urls: [] },
+              { title: "Community", links: ["GitHub", "Discussions", "Contributing", "Code of Conduct"], urls: ["https://github.com/NGXSMK/ngxsmk-wallet", "https://github.com/NGXSMK/ngxsmk-wallet/discussions", "https://github.com/NGXSMK/ngxsmk-wallet/blob/main/CONTRIBUTING.md", "https://github.com/NGXSMK/ngxsmk-wallet/blob/main/CODE_OF_CONDUCT.md"] },
             ].map(s => (
-              <div key={s.title}><h4 className="text-sm font-semibold mb-3">{s.title}</h4><ul className="space-y-2">{s.links.map(l => <li key={l}><a href="#" className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</a></li>)}</ul></div>
+              <div key={s.title}><h4 className="text-sm font-semibold mb-3">{s.title}</h4><ul className="space-y-2">{s.links.map((l, idx) => {
+                const url = s.urls?.[idx] || "#";
+                return <li key={l}><a href={url} className="text-xs text-muted-foreground hover:text-foreground transition-colors">{l}</a></li>;
+              })}</ul></div>
             ))}
           </div>
           <div className="flex flex-col sm:flex-row items-center justify-between pt-8 border-t border-border/50 gap-4">
             <p className="text-xs text-muted-foreground">© 2026 NGXSMK. All rights reserved. Frontend licensed under MIT.</p>
             <div className="flex items-center gap-4">
-              {[Github, Twitter, Globe].map((Icon, i) => (
-                <a key={i} href="#" className="text-muted-foreground hover:text-foreground transition-colors"><Icon className="w-4 h-4" /></a>
+              {[{ icon: Github, url: "https://github.com/NGXSMK/ngxsmk-wallet" }, { icon: Twitter, url: "https://github.com/NGXSMK" }, { icon: Globe, url: "https://github.com/NGXSMK/ngxsmk-wallet" }].map((s, i) => (
+                <a key={i} href={s.url} target="_blank" rel="noopener noreferrer" className="text-muted-foreground hover:text-foreground transition-colors"><s.icon className="w-4 h-4" /></a>
               ))}
             </div>
           </div>
         </div>
       </footer>
-    </div>
+    </main>
   );
 }
 

@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://NGXSMK.github.io/ngxsmk-wallet/sitemap.xml
