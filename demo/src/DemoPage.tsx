@@ -1,761 +1,687 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
-  Eye,
-  EyeOff,
-  Key,
-  Bell,
-  Shield,
-  Lock,
-  Unlock,
-  Copy,
-  Check,
-  AlertTriangle,
-  Info,
-  CheckCircle,
-  XCircle,
-  Sun,
-  Moon,
-  Monitor,
+  LayoutDashboard,
   Wallet,
+  Key,
   Fingerprint,
   FileText,
-  Smartphone,
+  Shield,
   Scan,
-  LayoutDashboard,
-  Receipt,
-  UserCircle,
-  Palette,
-  ChevronRight,
+  Settings,
+  Lock,
   Search,
+  ChevronLeft,
+  ChevronRight,
+  UserCircle,
+  Smartphone,
+  Receipt,
+  Eye,
+  EyeOff,
+  Copy,
+  Check,
+  Plus,
+  Globe,
+  Clock,
+  AlertTriangle,
+  CheckCircle,
+  XCircle,
+  Info,
+  Download,
+  Moon,
+  Sun,
+  Monitor,
+  Bell,
 } from "lucide-react";
 
-const container = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.03 },
+const navSections = [
+  {
+    label: "Overview",
+    items: [
+      { id: "dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    ],
   },
-};
+  {
+    label: "Management",
+    items: [
+      { id: "vault", icon: Wallet, label: "Vault" },
+      { id: "passwords", icon: Key, label: "Passwords" },
+      { id: "passkeys", icon: Fingerprint, label: "Passkeys" },
+      { id: "documents", icon: FileText, label: "Documents" },
+      { id: "identity", icon: UserCircle, label: "Identity" },
+      { id: "expenses", icon: Receipt, label: "Expenses" },
+    ],
+  },
+  {
+    label: "Tools",
+    items: [
+      { id: "mfa", icon: Smartphone, label: "2FA" },
+      { id: "scanner", icon: Scan, label: "Scanner" },
+      { id: "security", icon: Shield, label: "Security" },
+    ],
+  },
+  {
+    label: null,
+    items: [
+      { id: "settings", icon: Settings, label: "Settings" },
+    ],
+  },
+];
 
-const itemVariants = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0 },
-};
+const mockPasswords = [
+  { id: 1, site: "github.com", username: "dev@ngxsmk.com", password: "G@thub!23Pass", category: "Dev", strength: 85, lastUsed: "2 min ago" },
+  { id: 2, site: "google.com", username: "user@gmail.com", password: "G00gle$ecure1", category: "Google", strength: 72, lastUsed: "1 hour ago" },
+  { id: 3, site: "aws.amazon.com", username: "admin@ngxsmk.com", password: "AWS#Str0ng!99", category: "Dev", strength: 95, lastUsed: "3 hours ago" },
+  { id: 4, site: "stackoverflow.com", username: "dev@ngxsmk.com", password: "St@ck0v3rfl0w", category: "Dev", strength: 68, lastUsed: "Yesterday" },
+  { id: 5, site: "reddit.com", username: "ngxsmk_user", password: "R3dd!tUs3r123", category: "Social", strength: 60, lastUsed: "2 days ago" },
+];
 
-function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
+const mockPasskeys = [
+  { id: 1, name: "Personal Laptop", rpId: "windows.hello.com", created: "Jan 15, 2026", lastUsed: "Today" },
+  { id: 2, name: "Work Laptop", rpId: "windows.hello.com", created: "Feb 20, 2026", lastUsed: "Yesterday" },
+  { id: 3, name: "Android Phone", rpId: "google.com", created: "Mar 5, 2026", lastUsed: "3 days ago" },
+];
+
+const mockDocuments = [
+  { id: 1, name: "Passport_Scan.pdf", type: "PDF", size: "2.4 MB", encrypted: true, updated: "Jan 10, 2026" },
+  { id: 2, name: "ID_Card_Front.png", type: "Image", size: "1.1 MB", encrypted: true, updated: "Jan 10, 2026" },
+  { id: 3, name: "Tax_Returns_2025.pdf", type: "PDF", size: "4.7 MB", encrypted: true, updated: "Mar 22, 2026" },
+  { id: 4, name: "SSH_Key_Ed25519", type: "Key", size: "1.2 KB", encrypted: true, updated: "Apr 1, 2026" },
+];
+
+const mockExpenses = [
+  { id: 1, merchant: "AWS Hosting", amount: -45.23, category: "Dev", date: "Today", status: "pending" },
+  { id: 2, merchant: "GitHub Copilot", amount: -10.00, category: "Dev", date: "Yesterday", status: "cleared" },
+  { id: 3, merchant: "Domain Renewal", amount: -14.99, category: "Infra", date: "Apr 15", status: "cleared" },
+  { id: 4, merchant: "Freelance Payment", amount: 1200.00, category: "Income", date: "Apr 14", status: "cleared" },
+  { id: 5, merchant: "DigitalOcean", amount: -24.00, category: "Dev", date: "Apr 12", status: "cleared" },
+];
+
+const mockTotpCodes = [
+  { id: 1, issuer: "GitHub", account: "dev@ngxsmk.com", code: "482 391", remaining: 42 },
+  { id: 2, issuer: "Google", account: "user@gmail.com", code: "730 184", remaining: 18 },
+  { id: 3, issuer: "Microsoft", account: "admin@ngxsmk.com", code: "215 607", remaining: 55 },
+  { id: 4, issuer: "AWS", account: "admin@ngxsmk.com", code: "893 462", remaining: 34 },
+];
+
+const mockIdentityRecords = [
+  { id: 1, type: "Passport", country: "United States", number: "P12345678", expiry: "Dec 2028", status: "valid" },
+  { id: 2, type: "Driver's License", country: "United States", number: "DL-42-1234567", expiry: "Jun 2027", status: "valid" },
+  { id: 3, type: "National ID", country: "United States", number: "XXX-XX-1234", expiry: "N/A", status: "valid" },
+];
+
+const securityFindings = [
+  { id: 1, severity: "high", title: "Weak password detected", detail: "reddit.com password is weak", action: "Change password" },
+  { id: 2, severity: "medium", title: "Password reused", detail: "3 passwords use similar patterns", action: "Rotate passwords" },
+  { id: 3, severity: "low", title: "Aging password", detail: "aws.amazon.com password is 180+ days old", action: "Review" },
+];
+
+const recentScans = [
+  { id: 1, path: "~/Documents/config/", secrets: 0, status: "clean", date: "Today" },
+  { id: 2, path: "~/.ssh/", secrets: 0, status: "clean", date: "Today" },
+  { id: 3, path: "~/Projects/api-keys.env", secrets: 2, status: "warning", date: "Apr 16" },
+];
+
+const vaultItems = [
+  { id: 1, name: "Personal", icon: Lock, count: 12, color: "text-blue-500", bg: "bg-blue-500/10" },
+  { id: 2, name: "Work", icon: Lock, count: 8, color: "text-purple-500", bg: "bg-purple-500/10" },
+  { id: 3, name: "Shared", icon: Lock, count: 4, color: "text-emerald-500", bg: "bg-emerald-500/10" },
+  { id: 4, name: "Archive", icon: Lock, count: 3, color: "text-amber-500", bg: "bg-amber-500/10" },
+];
+
+function Badge({ children, variant = "default", className = "" }: { children: React.ReactNode; variant?: "default" | "success" | "warning" | "info" | "destructive" | "secondary" | "outline"; className?: string }) {
+  const colors = {
+    default: "bg-primary text-primary-foreground",
+    secondary: "bg-secondary text-secondary-foreground",
+    outline: "border border-border text-foreground",
+    destructive: "bg-red-500/10 text-red-500",
+    success: "bg-green-500/10 text-green-500",
+    warning: "bg-yellow-500/10 text-yellow-500",
+    info: "bg-blue-500/10 text-blue-500",
+  };
+  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${colors[variant]} ${className}`}>{children}</span>;
+}
+
+function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
   return (
-    <motion.div variants={itemVariants}>
-      <div className="overflow-hidden rounded-xl border border-border/50 bg-card/60 backdrop-blur-sm shadow-sm transition-all duration-200">
-        <div className="flex flex-col space-y-1.5 p-6 pb-2">
-          <h3 className="text-base font-semibold leading-none tracking-tight">{title}</h3>
-          {description && <p className="text-sm text-muted-foreground">{description}</p>}
-        </div>
-        <div className="p-6 pt-4">{children}</div>
+    <div className="flex items-center justify-between mb-8">
+      <div>
+        <h1 className="text-3xl font-bold tracking-tight"><span className="text-gradient">{title}</span></h1>
+        {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
       </div>
-    </motion.div>
-  );
-}
-
-function Badge({
-  children,
-  variant = "default",
-  className = "",
-}: {
-  children: React.ReactNode;
-  variant?: "default" | "secondary" | "outline" | "destructive" | "success" | "warning" | "info";
-  className?: string;
-}) {
-  const variants: Record<string, string> = {
-    default: "border-transparent bg-primary text-primary-foreground",
-    secondary: "border-transparent bg-secondary text-secondary-foreground",
-    outline: "text-foreground",
-    destructive: "border-transparent bg-red-500/10 text-red-500",
-    success: "border-transparent bg-green-500/10 text-green-500",
-    warning: "border-transparent bg-yellow-500/10 text-yellow-500",
-    info: "border-transparent bg-blue-500/10 text-blue-500",
-  };
-  return (
-    <span
-      className={`inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors ${variants[variant]} ${className}`}
-    >
-      {children}
-    </span>
-  );
-}
-
-function Button({
-  children,
-  variant = "default",
-  size = "default",
-  disabled,
-  className = "",
-  ...props
-}: {
-  children: React.ReactNode;
-  variant?: "default" | "secondary" | "outline" | "ghost" | "destructive" | "link";
-  size?: "sm" | "default" | "lg";
-  disabled?: boolean;
-  className?: string;
-  onClick?: () => void;
-}) {
-  const variants: Record<string, string> = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90 shadow-lg shadow-primary/25",
-    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    outline: "border border-border bg-background hover:bg-accent hover:text-accent-foreground",
-    ghost: "hover:bg-accent/80 hover:text-accent-foreground",
-    destructive: "bg-red-500 text-white hover:bg-red-500/90 shadow-lg shadow-red-500/20",
-    link: "text-primary underline-offset-4 hover:underline",
-  };
-  const sizes: Record<string, string> = {
-    sm: "h-9 rounded-lg px-3 text-sm",
-    default: "h-10 px-4 py-2 text-sm",
-    lg: "h-11 rounded-xl px-8 text-base",
-  };
-  return (
-    <button
-      disabled={disabled}
-      className={`inline-flex items-center justify-center whitespace-nowrap rounded-xl text-sm font-medium ring-offset-background transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.97] ${variants[variant]} ${sizes[size]} ${className}`}
-      {...props}
-    >
-      {children}
-    </button>
-  );
-}
-
-function Input({
-  placeholder,
-  type = "text",
-  error,
-  value,
-  onChange,
-  className = "",
-}: {
-  placeholder?: string;
-  type?: string;
-  error?: string;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  className?: string;
-}) {
-  return (
-    <div className="relative">
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        className={`flex h-10 w-full rounded-lg border bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${
-          error ? "border-red-500" : "border-input hover:border-muted-foreground/30"
-        } ${className}`}
-      />
-      {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+      {action}
     </div>
   );
 }
 
-function calculateStrength(password: string) {
-  let score = 0;
-  if (password.length >= 8) score += 20;
-  if (password.length >= 12) score += 10;
-  if (password.length >= 16) score += 10;
-  if (/[a-z]/.test(password)) score += 10;
-  if (/[A-Z]/.test(password)) score += 10;
-  if (/[0-9]/.test(password)) score += 15;
-  if (/[^a-zA-Z0-9]/.test(password)) score += 15;
-  if (password.length > 20) score += 10;
-  const label = score >= 90 ? "Very Strong" : score >= 70 ? "Strong" : score >= 50 ? "Medium" : score >= 30 ? "Weak" : "Very Weak";
-  const color = score >= 90 ? "#22c55e" : score >= 70 ? "#84cc16" : score >= 50 ? "#eab308" : score >= 30 ? "#f97316" : "#ef4444";
-  return { score, label, color };
-}
+export function DemoApp({ dark, onToggleDark }: { dark: boolean; onToggleDark: () => void }) {
+  const [activePage, setActivePage] = useState("dashboard");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [showPassword, setShowPassword] = useState<Record<number, boolean>>({});
+  const [copiedId, setCopiedId] = useState<number | null>(null);
+  const [settings, setSettings] = useState<{ notifications: boolean; autoLock: boolean; theme: "light" | "dark" | "system"; compact: boolean }>({ notifications: true, autoLock: true, theme: "system", compact: false });
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
 
-export function DemoPage() {
-  const [password, setPassword] = useState("Demo@123");
-  const [showPassword, setShowPassword] = useState(false);
-  const [notifications, setNotifications] = useState(true);
-  const [autoLock, setAutoLock] = useState(true);
-  const [progress, setProgress] = useState(45);
-  const [copied, setCopied] = useState(false);
-  const [themeDemo, setThemeDemo] = useState<"light" | "dark" | "system">("system");
-  const [activeTab, setActiveTab] = useState("overview");
-
-  const strength = calculateStrength(password);
-
-  const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const handleCopy = async (id: number, text: string) => {
+    await navigator.clipboard.writeText(text);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
   };
 
-  return (
-    <div className="space-y-8">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">
-              <span className="text-gradient">UI Demo</span>
-            </h1>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Component showcase and interactive examples
-            </p>
-          </div>
-          <Badge variant="info" className="gap-1.5 rounded-lg px-3 py-1.5">
-            <Eye className="h-3.5 w-3.5" />
-            {new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+  const togglePassword = (id: number) => {
+    setShowPassword((prev) => ({ ...prev, [id]: !prev[id] }));
+  };
+
+  const renderPage = () => {
+    switch (activePage) {
+      case "dashboard": return <DashboardPage />;
+      case "vault": return <VaultPage />;
+      case "passwords": return <PasswordsPage />;
+      case "passkeys": return <PasskeysPage />;
+      case "documents": return <DocumentsPage />;
+      case "identity": return <IdentityPage />;
+      case "expenses": return <ExpensesPage />;
+      case "mfa": return <MfaPage />;
+      case "scanner": return <ScannerPage />;
+      case "security": return <SecurityPage />;
+      case "settings": return <SettingsPage />;
+      default: return <DashboardPage />;
+    }
+  };
+
+  function DashboardPage() {
+    const stats = [
+      { label: "Passwords", icon: Key, value: mockPasswords.length, color: "text-blue-500", bg: "bg-blue-500/10", page: "passwords" },
+      { label: "Passkeys", icon: Fingerprint, value: mockPasskeys.length, color: "text-purple-500", bg: "bg-purple-500/10", page: "passkeys" },
+      { label: "Documents", icon: FileText, value: mockDocuments.length, color: "text-emerald-500", bg: "bg-emerald-500/10", page: "documents" },
+      { label: "Security Score", icon: Shield, value: "82%", color: "text-amber-500", bg: "bg-amber-500/10", page: "security" },
+    ];
+    const quickLinks = [
+      { label: "New Password", page: "passwords", icon: Key, color: "from-blue-500 to-blue-600" },
+      { label: "Add Passkey", page: "passkeys", icon: Fingerprint, color: "from-purple-500 to-purple-600" },
+      { label: "New Document", page: "documents", icon: FileText, color: "from-emerald-500 to-emerald-600" },
+      { label: "Security Report", page: "security", icon: Shield, color: "from-amber-500 to-amber-600" },
+    ];
+    return (
+      <div className="space-y-8 max-w-6xl">
+        <PageHeader title="Dashboard" subtitle="Welcome to your secure vault" action={
+          <Badge variant="success" className="gap-1.5 px-3 py-1.5 rounded-lg">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+            Vault Active
           </Badge>
+        } />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {stats.map((stat, i) => {
+            const Icon = stat.icon;
+            return (
+              <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.02 }}
+                onClick={() => setActivePage(stat.page)} className="cursor-pointer group">
+                <div className="rounded-xl border bg-card/60 p-5 h-full group-hover:-translate-y-0.5 transition-all duration-200">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className={`p-2.5 rounded-xl ${stat.bg}`}><Icon className={`w-5 h-5 ${stat.color}`} /></div>
+                  </div>
+                  <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+                  <p className="text-xs text-muted-foreground mt-1.5">{stat.label}</p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
-      </motion.div>
-
-      <motion.div variants={container} initial="hidden" animate="show" className="space-y-6">
-        {/* Buttons */}
-        <Section title="Buttons" description="Variants and sizes">
-          <div className="space-y-4">
-            <div className="flex flex-wrap gap-2">
-              <Button variant="default">Default</Button>
-              <Button variant="secondary">Secondary</Button>
-              <Button variant="outline">Outline</Button>
-              <Button variant="ghost">Ghost</Button>
-              <Button variant="destructive">Destructive</Button>
-              <Button variant="link">Link</Button>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Button size="sm">Small</Button>
-              <Button size="default">Default</Button>
-              <Button size="lg">Large</Button>
-              <button className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-all duration-200 hover:bg-primary/90 active:scale-[0.97]">
-                <Key className="h-4 w-4" />
-              </button>
-              <Button disabled>Disabled</Button>
-            </div>
-          </div>
-        </Section>
-
-        {/* Badges */}
-        <Section title="Badges" description="Status and labeling">
-          <div className="flex flex-wrap gap-2">
-            <Badge variant="default">Default</Badge>
-            <Badge variant="secondary">Secondary</Badge>
-            <Badge variant="outline">Outline</Badge>
-            <Badge variant="destructive">Destructive</Badge>
-            <Badge variant="success">Success</Badge>
-            <Badge variant="warning">Warning</Badge>
-            <Badge variant="info">Info</Badge>
-            <Badge variant="success" className="gap-1">
-              <CheckCircle className="h-3 w-3" /> Active
-            </Badge>
-            <Badge variant="warning" className="gap-1">
-              <AlertTriangle className="h-3 w-3" /> Expiring
-            </Badge>
-            <Badge variant="info" className="gap-1">
-              <Bell className="h-3 w-3" /> 3 Alerts
-            </Badge>
-          </div>
-        </Section>
-
-        {/* Cards */}
-        <Section title="Cards" description="Content containers with different styles">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-            <div className="rounded-xl border border-primary/10 bg-primary/5 p-5">
-              <div className="flex flex-col items-center gap-3 text-center">
-                <div className="rounded-xl bg-primary/10 p-3">
-                  <Shield className="h-6 w-6 text-primary" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {quickLinks.map((link, i) => {
+            const Icon = link.icon;
+            return (
+              <motion.button key={link.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 + i * 0.02 }}
+                onClick={() => setActivePage(link.page)} className="relative group">
+                <div className={`absolute inset-0 bg-gradient-to-br ${link.color} rounded-2xl opacity-0 group-hover:opacity-15 transition-opacity`} />
+                <div className="relative rounded-xl border bg-card/60 p-5 flex flex-col items-center text-center gap-3 group-hover:-translate-y-0.5 transition-all">
+                  <div className="p-3 rounded-xl bg-primary/5"><Icon className="w-6 h-6 text-primary" /></div>
+                  <span className="text-sm font-medium">{link.label}</span>
                 </div>
-                <p className="text-sm font-medium">Security Card</p>
-                <p className="text-xs text-muted-foreground">Protected content container</p>
-              </div>
-            </div>
-            <div className="rounded-xl border border-border/50 bg-card/60 p-5 backdrop-blur-sm">
-              <div className="flex flex-col items-center gap-3 text-center">
-                <div className="rounded-xl bg-green-500/10 p-3">
-                  <Unlock className="h-6 w-6 text-green-500" />
-                </div>
-                <p className="text-sm font-medium">Glass Card</p>
-                <p className="text-xs text-muted-foreground">Morphism style</p>
-              </div>
-            </div>
-            <div
-              className="relative overflow-hidden rounded-xl p-5"
-              style={{ background: "linear-gradient(135deg, rgba(139,92,246,0.1), rgba(168,85,247,0.1))" }}
-            >
-              <div className="relative z-10 flex flex-col items-center gap-3 text-center">
-                <div className="rounded-xl bg-gradient-to-br from-primary to-purple-500 p-3">
-                  <Lock className="h-6 w-6 text-white" />
-                </div>
-                <p className="text-sm font-medium">Gradient Card</p>
-                <p className="text-xs text-muted-foreground">Custom background</p>
-              </div>
-            </div>
-          </div>
-        </Section>
-
-        {/* Form Controls */}
-        <Section title="Form Controls" description="Inputs, selects, and password fields">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Default Input</label>
-                <Input placeholder="Enter text..." />
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">With Error</label>
-                <Input placeholder="Invalid input" error="This field is required" />
-              </div>
-            </div>
-            <div>
-              <label className="mb-2 block text-sm font-medium">Password with Strength Meter</label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password..."
-                  className="pr-10"
-                />
-                <button
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              <div className="mt-2 space-y-1.5">
-                <div className="relative h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-                  <div
-                    className="h-full rounded-full transition-all duration-300"
-                    style={{ width: `${strength.score}%`, backgroundColor: strength.color }}
-                  />
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-xs" style={{ color: strength.color }}>
-                    {strength.label} ({strength.score}/100)
-                  </span>
-                  <button
-                    onClick={() => handleCopy(password)}
-                    className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
-                  >
-                    {copied ? <Check className="h-3 w-3" /> : <Copy className="h-3 w-3" />}
-                    {copied ? "Copied!" : "Copy"}
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Select Dropdown</label>
-                <div className="relative">
-                  <select className="flex h-10 w-full appearance-none rounded-xl border border-input bg-background/50 px-3 py-2 pr-9 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
-                    <option>Standard Plan</option>
-                    <option>Premium Plan</option>
-                    <option>Enterprise Plan</option>
-                  </select>
-                  <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
-                </div>
-              </div>
-              <div className="space-y-2">
-                <label className="text-sm font-medium">Theme Preference</label>
-                <div className="relative">
-                  <select
-                    value={themeDemo}
-                    onChange={(e) => setThemeDemo(e.target.value as typeof themeDemo)}
-                    className="flex h-10 w-full appearance-none rounded-xl border border-input bg-background/50 px-3 py-2 pr-9 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                  >
-                    <option value="light">Light</option>
-                    <option value="dark">Dark</option>
-                    <option value="system">System</option>
-                  </select>
-                  <ChevronRight className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 rotate-90 text-muted-foreground" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </Section>
-
-        {/* Interactive Controls */}
-        <Section title="Interactive Controls" description="Toggles, switches, and sliders">
-          <div className="space-y-4">
-            <div className="flex items-center justify-between rounded-xl bg-muted/30 p-3">
-              <div className="flex items-center gap-3">
-                <Bell className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Notifications</p>
-                  <p className="text-xs text-muted-foreground">Receive security alerts</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setNotifications(!notifications)}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors ${
-                  notifications ? "bg-primary" : "bg-input"
-                }`}
-              >
-                <span
-                  className={`block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform ${
-                    notifications ? "translate-x-4" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
-            <div className="flex items-center justify-between rounded-xl bg-muted/30 p-3">
-              <div className="flex items-center gap-3">
-                <Lock className="h-4 w-4 text-muted-foreground" />
-                <div>
-                  <p className="text-sm font-medium">Auto-Lock</p>
-                  <p className="text-xs text-muted-foreground">Lock after inactivity</p>
-                </div>
-              </div>
-              <button
-                onClick={() => setAutoLock(!autoLock)}
-                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors ${
-                  autoLock ? "bg-primary" : "bg-input"
-                }`}
-              >
-                <span
-                  className={`block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform ${
-                    autoLock ? "translate-x-4" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
-            <div className="flex items-center justify-between rounded-xl bg-muted/30 p-3">
-              <div className="flex items-center gap-3">
-                {themeDemo === "dark" ? (
-                  <Moon className="h-4 w-4" />
-                ) : themeDemo === "light" ? (
-                  <Sun className="h-4 w-4" />
-                ) : (
-                  <Monitor className="h-4 w-4" />
-                )}
-                <div>
-                  <p className="text-sm font-medium">Theme: {themeDemo.charAt(0).toUpperCase() + themeDemo.slice(1)}</p>
-                  <p className="text-xs text-muted-foreground">Current display mode</p>
-                </div>
-              </div>
-              <div className="flex gap-1">
-                {(["light", "dark", "system"] as const).map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setThemeDemo(t)}
-                    className={`rounded-lg p-1.5 transition-colors ${
-                      themeDemo === t
-                        ? "bg-primary/20 text-primary"
-                        : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-                    }`}
-                  >
-                    {t === "light" ? (
-                      <Sun className="h-4 w-4" />
-                    ) : t === "dark" ? (
-                      <Moon className="h-4 w-4" />
-                    ) : (
-                      <Monitor className="h-4 w-4" />
-                    )}
-                  </button>
-                ))}
-              </div>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="font-medium">Progress: {progress}%</span>
-                <span className="text-xs text-muted-foreground">Drag to adjust</span>
-              </div>
-              <input
-                type="range"
-                min={0}
-                max={100}
-                value={progress}
-                onChange={(e) => setProgress(Number(e.target.value))}
-                className="h-2 w-full cursor-pointer appearance-none rounded-full bg-secondary accent-primary"
-              />
-            </div>
-          </div>
-        </Section>
-
-        {/* Tabs */}
-        <Section title="Tabs" description="Tabbed content navigation">
-          <div className="w-full">
-            <div className="inline-flex h-10 items-center justify-center rounded-lg bg-muted p-1 text-muted-foreground">
-              {["overview", "security", "settings"].map((tab) => (
-                <button
-                  key={tab}
-                  onClick={() => setActiveTab(tab)}
-                  className={`inline-flex items-center justify-center whitespace-nowrap rounded-md px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ${
-                    activeTab === tab ? "bg-background text-foreground shadow-sm" : ""
-                  }`}
-                >
-                  {tab.charAt(0).toUpperCase() + tab.slice(1)}
-                </button>
-              ))}
-            </div>
-            <div className="mt-2">
-              {activeTab === "overview" && (
-                <div className="space-y-3">
-                  <div className="rounded-xl bg-muted/30 p-4 text-sm">
-                    <p>Welcome to the UI demo. This tab shows the overview of available components.</p>
-                  </div>
-                  <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                    <div className="rounded-lg bg-primary/5 p-3">
-                      <p className="text-lg font-bold text-primary">14</p>
-                      <p className="text-muted-foreground">Components</p>
-                    </div>
-                    <div className="rounded-lg bg-green-500/5 p-3">
-                      <p className="text-lg font-bold text-green-500">7</p>
-                      <p className="text-muted-foreground">Variants</p>
-                    </div>
-                    <div className="rounded-lg bg-purple-500/5 p-3">
-                      <p className="text-lg font-bold text-purple-500">3</p>
-                      <p className="text-muted-foreground">Sections</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {activeTab === "security" && (
-                <div className="space-y-3">
-                  <div className="rounded-xl border border-amber-500/10 bg-amber-500/5 p-4 text-sm">
-                    <div className="flex items-center gap-2 font-medium text-amber-500">
-                      <Shield className="h-4 w-4" />
-                      Security Status
-                    </div>
-                    <p className="mt-1 text-muted-foreground">All systems secure. No vulnerabilities detected.</p>
-                    <div className="mt-2 flex gap-2">
-                      <Badge variant="success">Encrypted</Badge>
-                      <Badge variant="info">2FA Active</Badge>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {activeTab === "settings" && (
-                <div className="space-y-3 rounded-xl bg-muted/30 p-4 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Auto-Save</span>
-                    <button className="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent bg-primary shadow-sm transition-colors">
-                      <span className="block h-4 w-4 translate-x-4 rounded-full bg-white shadow-lg ring-0 transition-transform" />
-                    </button>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Dark Mode</span>
-                    <button className="relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent bg-input shadow-sm transition-colors">
-                      <span className="block h-4 w-4 translate-x-0 rounded-full bg-white shadow-lg ring-0 transition-transform" />
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </Section>
-
-        {/* Navigation Preview */}
-        <Section title="Navigation" description="Sidebar menu structure preview">
-          <div className="space-y-4">
+              </motion.button>
+            );
+          })}
+        </div>
+        <div className="rounded-xl border bg-card/60">
+          <div className="p-6 pb-2"><h3 className="text-sm font-medium flex items-center gap-2"><Clock className="w-4 h-4 text-primary" /> Recent Activity</h3></div>
+          <div className="p-6 pt-2 space-y-1">
             {[
-              {
-                label: "Overview",
-                items: [
-                  { icon: LayoutDashboard, label: "Dashboard" },
-                ],
-              },
-              {
-                label: "Management",
-                items: [
-                  { icon: Wallet, label: "Vault" },
-                  { icon: Key, label: "Passwords" },
-                  { icon: Fingerprint, label: "Passkeys" },
-                  { icon: FileText, label: "Documents" },
-                  { icon: UserCircle, label: "Identity" },
-                  { icon: Receipt, label: "Expenses" },
-                ],
-              },
-              {
-                label: "Tools",
-                items: [
-                  { icon: Smartphone, label: "2FA" },
-                  { icon: Scan, label: "Scanner" },
-                  { icon: Shield, label: "Security" },
-                  { icon: Palette, label: "UI Demo" },
-                ],
-              },
-            ].map((section) => (
-              <div key={section.label}>
-                <p className="px-2 pb-1 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/30">
-                  {section.label}
-                </p>
-                <div className="space-y-0.5">
-                  {section.items.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = item.label === "UI Demo";
-                    return (
-                      <div
-                        key={item.label}
-                        className={`flex cursor-default items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium transition-colors ${
-                          isActive
-                            ? "bg-primary/15 font-semibold text-primary"
-                            : "text-muted-foreground/50 hover:bg-accent/40 hover:text-foreground"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5 shrink-0" />
-                        <span>{item.label}</span>
-                        {isActive && (
-                          <span className="ml-auto flex h-5 items-center rounded-md bg-primary/20 px-2 text-[10px] font-medium text-primary">
-                            Active
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
+              { action: "Unlocked vault containing 5 password records", time: "Just now" },
+              { action: "New passkey registered: Personal Laptop", time: "Today" },
+              { action: "Security scan completed — no issues found", time: "2 hours ago" },
+              { action: "Password rotated: github.com", time: "Yesterday" },
+            ].map((a, i) => (
+              <div key={i} className="flex items-center justify-between text-sm py-2.5 px-3 rounded-lg hover:bg-muted/30 transition-colors">
+                <span>{a.action}</span>
+                <span className="text-muted-foreground text-xs">{a.time}</span>
               </div>
             ))}
-            <div className="border-t border-border/50 pt-3">
-              <div className="flex cursor-default items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-muted-foreground/50 transition-colors hover:bg-accent/40 hover:text-foreground">
-                <Search className="h-5 w-5 shrink-0" />
-                <span className="flex-1">Search</span>
-                <kbd className="hidden items-center gap-1 rounded-md border border-border/40 bg-muted/40 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground/70 md:inline-flex">
-                  <span>⌘</span>K
-                </kbd>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function PasswordsPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Passwords" subtitle={`${mockPasswords.length} stored credentials`} action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Plus className="w-4 h-4" /> Add Password</button>
+        } />
+        <div className="space-y-2">
+          {mockPasswords.map((p, i) => (
+            <motion.div key={p.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+              className="rounded-xl border bg-card/60 p-4 flex items-center gap-4 group hover:border-primary/20 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                <Key className="w-5 h-5 text-primary" />
               </div>
-              <div className="flex cursor-default items-center gap-3 rounded-xl px-2.5 py-2 text-sm font-medium text-muted-foreground/50 transition-colors hover:bg-destructive/10 hover:text-destructive">
-                <Lock className="h-5 w-5 shrink-0" />
-                <span>Lock Vault</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium">{p.site}</p>
+                <p className="text-xs text-muted-foreground truncate">{p.username}</p>
               </div>
+              <div className="flex items-center gap-3">
+                <div className="hidden md:block"><Badge variant={p.strength >= 80 ? "success" : p.strength >= 60 ? "warning" : "destructive"}>{p.strength}%</Badge></div>
+                <button onClick={() => togglePassword(p.id)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  {showPassword[p.id] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+                <button onClick={() => handleCopy(p.id, p.password)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  {copiedId === p.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                </button>
+                <span className="text-xs text-muted-foreground hidden sm:block">{p.lastUsed}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function PasskeysPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Passkeys" subtitle="FIDO2/WebAuthn credentials" action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Plus className="w-4 h-4" /> Register Passkey</button>
+        } />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {mockPasskeys.map((p, i) => (
+            <motion.div key={p.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="rounded-xl border bg-card/60 p-5 space-y-3 hover:border-primary/20 transition-colors">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center"><Fingerprint className="w-5 h-5 text-purple-500" /></div>
+                  <div><p className="text-sm font-medium">{p.name}</p><p className="text-xs text-muted-foreground">{p.rpId}</p></div>
+                </div>
+                <Badge variant="success">Active</Badge>
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground border-t border-border/50 pt-3">
+                <span>Created: {p.created}</span>
+                <span>Last: {p.lastUsed}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function VaultPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Vaults" subtitle="Your encrypted vaults" action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Plus className="w-4 h-4" /> New Vault</button>
+        } />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {vaultItems.map((v, i) => {
+            const Icon = v.icon;
+            return (
+              <motion.div key={v.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                className="rounded-xl border bg-card/60 p-5 flex items-center gap-4 cursor-pointer hover:border-primary/20 group hover:-translate-y-0.5 transition-all">
+                <div className={`p-3 rounded-xl ${v.bg}`}><Icon className={`w-6 h-6 ${v.color}`} /></div>
+                <div className="flex-1">
+                  <p className="text-sm font-medium">{v.name}</p>
+                  <p className="text-xs text-muted-foreground">{v.count} items</p>
+                </div>
+                <ChevronRight className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+              </motion.div>
+            );
+          })}
+        </div>
+        <div className="rounded-xl border bg-card/60 p-6">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center"><Globe className="w-5 h-5 text-blue-500" /></div>
+            <div><p className="text-sm font-medium">Cloud Sync</p><p className="text-xs text-muted-foreground">Sync your vaults via Google Drive, Dropbox, or OneDrive</p></div>
+          </div>
+          <div className="flex gap-2">
+            {["Google Drive", "Dropbox", "OneDrive"].map((s) => (
+              <button key={s} className="flex-1 h-9 rounded-lg border border-border bg-background text-xs font-medium hover:bg-accent transition-colors">{s}</button>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function DocumentsPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Documents" subtitle="Encrypted file storage" action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Download className="w-4 h-4" /> Upload</button>
+        } />
+        <div className="space-y-2">
+          {mockDocuments.map((d, i) => (
+            <motion.div key={d.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="rounded-xl border bg-card/60 p-4 flex items-center gap-4 group hover:border-primary/20 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center shrink-0"><FileText className="w-5 h-5 text-emerald-500" /></div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{d.name}</p>
+                <p className="text-xs text-muted-foreground">{d.type} · {d.size}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Badge variant="success" className="gap-1"><Lock className="w-3 h-3" /> Encrypted</Badge>
+                <span className="text-xs text-muted-foreground hidden sm:block">{d.updated}</span>
+                <button className="text-muted-foreground hover:text-foreground transition-colors"><Download className="w-4 h-4" /></button>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function IdentityPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Identity" subtitle="Digital identity records" action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Plus className="w-4 h-4" /> Add Record</button>
+        } />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {mockIdentityRecords.map((r, i) => (
+            <motion.div key={r.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="rounded-xl border bg-card/60 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-500/10 flex items-center justify-center"><UserCircle className="w-5 h-5 text-cyan-500" /></div>
+                  <div><p className="text-sm font-medium">{r.type}</p><p className="text-xs text-muted-foreground">{r.country}</p></div>
+                </div>
+                <Badge variant={r.status === "valid" ? "success" : "warning"}>{r.status}</Badge>
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground border-t border-border/50 pt-3">
+                <span>#{r.number}</span>
+                <span>Exp: {r.expiry}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function MfaPage() {
+    const [codes] = useState(mockTotpCodes.map(c => ({ ...c, remaining: Math.floor(Math.random() * 60) })));
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Two-Factor Auth" subtitle="TOTP authenticator codes" action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Plus className="w-4 h-4" /> Add Account</button>
+        } />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {codes.map((c, i) => (
+            <motion.div key={c.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="rounded-xl border bg-card/60 p-5 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center"><Smartphone className="w-5 h-5 text-orange-500" /></div>
+                  <div><p className="text-sm font-medium">{c.issuer}</p><p className="text-xs text-muted-foreground">{c.account}</p></div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-2xl font-mono font-bold tracking-widest text-primary">{c.code}</span>
+                <button onClick={() => handleCopy(c.id, c.code.replace(" ", ""))} className="text-muted-foreground hover:text-foreground transition-colors">
+                  {copiedId === c.id ? <Check className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+              <div className="space-y-1">
+                <div className="flex justify-between text-xs text-muted-foreground"><span>Code expires</span><span>{c.remaining}s</span></div>
+                <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                  <div className="h-full rounded-full bg-primary transition-all duration-1000" style={{ width: `${(c.remaining / 60) * 100}%` }} />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function ExpensesPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Expenses" subtitle="Transaction & expense tracking" action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Plus className="w-4 h-4" /> Add Transaction</button>
+        } />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[
+            { label: "Total Spent", value: "$94.22", color: "text-red-500", bg: "bg-red-500/10" },
+            { label: "Income", value: "$1,200.00", color: "text-green-500", bg: "bg-green-500/10" },
+            { label: "Categories", value: "3", color: "text-blue-500", bg: "bg-blue-500/10" },
+            { label: "Pending", value: "1", color: "text-amber-500", bg: "bg-amber-500/10" },
+          ].map((s, i) => (
+            <div key={i} className="rounded-xl border bg-card/60 p-4">
+              <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+              <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-2">
+          {mockExpenses.map((e, i) => (
+            <motion.div key={e.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.03 }}
+              className="rounded-xl border bg-card/60 p-4 flex items-center gap-4">
+              <div className={`w-2 h-2 rounded-full ${e.amount < 0 ? "bg-red-500" : "bg-green-500"}`} />
+              <div className="flex-1">
+                <p className="text-sm font-medium">{e.merchant}</p>
+                <p className="text-xs text-muted-foreground">{e.category} · {e.date}</p>
+              </div>
+              <div className="text-right">
+                <p className={`text-sm font-bold ${e.amount < 0 ? "text-red-500" : "text-green-500"}`}>
+                  {e.amount < 0 ? "-" : "+"}${Math.abs(e.amount).toFixed(2)}
+                </p>
+                <Badge variant={e.status === "cleared" ? "success" : "warning"}>{e.status === "cleared" ? "Cleared" : "Pending"}</Badge>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function SecurityPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Security" subtitle="Vault health & breach monitoring" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="rounded-xl border bg-card/60 p-6 text-center col-span-1">
+            <p className="text-4xl font-bold text-amber-500">82</p>
+            <p className="text-xs text-muted-foreground mt-1">Security Score</p>
+            <div className="mt-3 h-2 rounded-full bg-secondary overflow-hidden">
+              <div className="h-full rounded-full bg-amber-500" style={{ width: "82%" }} />
             </div>
           </div>
-        </Section>
-
-        {/* Dialogs & Modals */}
-        <Section title="Dialogs & Modals" description="Interactive overlay components">
-          <div className="flex flex-wrap gap-2">
-            <Button
-              onClick={() => {
-                const el = document.getElementById("demo-dialog-overlay");
-                if (el) el.classList.remove("hidden");
-              }}
-              variant="default"
-            >
-              Open Dialog
-            </Button>
-            <Button
-              onClick={() => {
-                const el = document.getElementById("demo-info-dialog-overlay");
-                if (el) el.classList.remove("hidden");
-              }}
-              variant="outline"
-            >
-              Info Dialog
-            </Button>
-
-            {/* Confirm Dialog */}
-            <div
-              id="demo-dialog-overlay"
-              className="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  e.currentTarget.classList.add("hidden");
-                }
-              }}
-            >
-              <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg sm:rounded-xl">
-                <div className="flex flex-col space-y-1.5">
-                  <h2 className="text-lg font-semibold leading-none tracking-tight">Confirm Action</h2>
-                  <p className="text-sm text-muted-foreground">This action cannot be undone. Are you sure?</p>
-                </div>
-                <div className="my-4 flex items-center gap-2 rounded-xl bg-muted/30 p-4 text-sm text-muted-foreground">
-                  <AlertTriangle className="h-4 w-4 shrink-0 text-amber-500" />
-                  <span>This will permanently remove the selected items.</span>
-                </div>
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => document.getElementById("demo-dialog-overlay")?.classList.add("hidden")}>
-                    Cancel
-                  </Button>
-                  <Button variant="destructive" onClick={() => document.getElementById("demo-dialog-overlay")?.classList.add("hidden")}>
-                    Confirm
-                  </Button>
-                </div>
+          <div className="rounded-xl border bg-card/60 p-6 flex items-center justify-between col-span-2">
+            {[
+              { label: "Encrypted", icon: Lock, color: "text-green-500" },
+              { label: "2FA Active", icon: Smartphone, color: "text-green-500" },
+              { label: "No Breaches", icon: Shield, color: "text-green-500" },
+            ].map((s, i) => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <div className="p-2.5 rounded-xl bg-green-500/10"><s.icon className={`w-5 h-5 ${s.color}`} /></div>
+                <span className="text-xs font-medium">{s.label}</span>
               </div>
-            </div>
-
-            {/* Info Dialog */}
-            <div
-              id="demo-info-dialog-overlay"
-              className="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm"
-              onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                  e.currentTarget.classList.add("hidden");
-                }
-              }}
-            >
-              <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 border bg-background p-6 shadow-lg sm:rounded-xl">
-                <div className="flex flex-col space-y-1.5">
-                  <h2 className="text-lg font-semibold leading-none tracking-tight">About NGXSMK Wallet</h2>
-                  <p className="text-sm text-muted-foreground">Version 1.0.0 — Privacy-first digital identity manager</p>
-                </div>
-                <div className="my-4 space-y-3 text-sm">
-                  <div className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">
-                    <Shield className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">End-to-End Encrypted</p>
-                      <p className="text-xs text-muted-foreground">Your data never leaves your device</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3 rounded-lg bg-muted/30 p-3">
-                    <Key className="h-5 w-5 text-primary" />
-                    <div>
-                      <p className="font-medium">Biometric Auth</p>
-                      <p className="text-xs text-muted-foreground">Face recognition & passkey support</p>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex justify-end">
-                  <Button variant="outline" onClick={() => document.getElementById("demo-info-dialog-overlay")?.classList.add("hidden")}>
-                    Close
-                  </Button>
-                </div>
-              </div>
-            </div>
+            ))}
           </div>
-        </Section>
-
-        {/* Loading States */}
-        <Section title="Loading States" description="Skeletons and progress indicators">
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="rounded-xl border p-4">
-                  <div className="mb-3 h-4 w-24 animate-pulse rounded-md bg-muted/50" />
-                  <div className="mb-2 h-8 w-16 animate-pulse rounded-md bg-muted/50" />
-                  <div className="h-3 w-32 animate-pulse rounded-md bg-muted/50" />
+        </div>
+        <div>
+          <h3 className="text-sm font-medium mb-3 flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-500" /> Security Findings</h3>
+          <div className="space-y-2">
+            {securityFindings.map((f) => (
+              <div key={f.id} className="rounded-xl border bg-card/60 p-4 flex items-center gap-4">
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${f.severity === "high" ? "bg-red-500/10" : f.severity === "medium" ? "bg-amber-500/10" : "bg-blue-500/10"}`}>
+                  {f.severity === "high" ? <XCircle className="w-4 h-4 text-red-500" /> : f.severity === "medium" ? <AlertTriangle className="w-4 h-4 text-amber-500" /> : <Info className="w-4 h-4 text-blue-500" />}
                 </div>
+                <div className="flex-1"><p className="text-sm font-medium">{f.title}</p><p className="text-xs text-muted-foreground">{f.detail}</p></div>
+                <button className="text-xs font-medium text-primary hover:underline">{f.action}</button>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  function ScannerPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Secret Scanner" subtitle="Detect exposed credentials in your filesystem" action={
+          <button className="inline-flex items-center gap-2 h-10 px-4 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 shadow-lg shadow-primary/25"><Scan className="w-4 h-4" /> New Scan</button>
+        } />
+        <div className="rounded-xl border bg-card/60 p-6 text-center space-y-3">
+          <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto"><Scan className="w-7 h-7 text-primary" /></div>
+          <p className="text-sm font-medium">Local Secret Scanner</p>
+          <p className="text-xs text-muted-foreground max-w-md mx-auto">Scan your local filesystem and directories to find accidentally exposed API keys, tokens, or credentials.</p>
+        </div>
+        <div className="space-y-2">
+          {recentScans.map((s) => (
+            <div key={s.id} className="rounded-xl border bg-card/60 p-4 flex items-center gap-4">
+              <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${s.status === "clean" ? "bg-green-500/10" : "bg-amber-500/10"}`}>
+                {s.status === "clean" ? <CheckCircle className="w-4 h-4 text-green-500" /> : <AlertTriangle className="w-4 h-4 text-amber-500" />}
+              </div>
+              <div className="flex-1"><p className="text-sm font-medium truncate">{s.path}</p><p className="text-xs text-muted-foreground">{s.secrets > 0 ? `${s.secrets} secrets found` : "No secrets detected"} · {s.date}</p></div>
+              <Badge variant={s.status === "clean" ? "success" : "warning"}>{s.status === "clean" ? "Clean" : `${s.secrets} issues`}</Badge>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  function SettingsPage() {
+    return (
+      <div className="space-y-6 max-w-4xl">
+        <PageHeader title="Settings" subtitle="Application preferences" />
+        <div className="space-y-4">
+          {[
+            { icon: Bell, label: "Notifications", desc: "Receive security alerts and updates", value: settings.notifications, onChange: (v: boolean) => setSettings(s => ({ ...s, notifications: v })) },
+            { icon: Lock, label: "Auto-Lock", desc: "Lock vault after inactivity", value: settings.autoLock, onChange: (v: boolean) => setSettings(s => ({ ...s, autoLock: v })) },
+          ].map((s, i) => (
+            <div key={i} className="flex items-center justify-between rounded-xl border bg-card/60 p-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-lg bg-muted"><s.icon className="w-4 h-4 text-muted-foreground" /></div>
+                <div><p className="text-sm font-medium">{s.label}</p><p className="text-xs text-muted-foreground">{s.desc}</p></div>
+              </div>
+              <button onClick={() => s.onChange(!s.value)}
+                className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent shadow-sm transition-colors ${s.value ? "bg-primary" : "bg-input"}`}>
+                <span className={`block h-4 w-4 rounded-full bg-white shadow-lg ring-0 transition-transform ${s.value ? "translate-x-4" : "translate-x-0"}`} />
+              </button>
+            </div>
+          ))}
+          <div className="flex items-center justify-between rounded-xl border bg-card/60 p-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-muted"><Monitor className="w-4 h-4 text-muted-foreground" /></div>
+              <div><p className="text-sm font-medium">Theme</p><p className="text-xs text-muted-foreground">Display appearance</p></div>
+            </div>
+            <div className="flex gap-1">
+              {(["light", "dark", "system"] as const).map((t) => (
+                <button key={t} onClick={() => {
+                  if (t === "dark") onToggleDark();
+                  setSettings(s => ({ ...s, theme: t }));
+                }}
+                  className={`p-1.5 rounded-lg transition-colors ${settings.theme === t ? "bg-primary/20 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted/50"}`}>
+                  {t === "light" ? <Sun className="w-4 h-4" /> : t === "dark" ? <Moon className="w-4 h-4" /> : <Monitor className="w-4 h-4" />}
+                </button>
               ))}
             </div>
-            <div className="flex items-center gap-3 rounded-xl border p-4">
-              <div className="h-10 w-10 animate-pulse rounded-full bg-muted/50" />
-              <div className="flex-1 space-y-2">
-                <div className="h-4 w-48 animate-pulse rounded-md bg-muted/50" />
-                <div className="h-3 w-32 animate-pulse rounded-md bg-muted/50" />
-              </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen overflow-hidden bg-background">
+      <div className="fixed inset-0 bg-gradient-to-br from-primary/3 via-transparent to-blue-500/3 pointer-events-none" />
+      <aside className={`fixed left-0 top-0 h-full z-30 flex flex-col border-r border-border/50 bg-background/80 backdrop-blur-xl transition-[width] duration-300 ${sidebarCollapsed ? "w-16" : "w-60"}`}>
+        <div className="flex items-center h-14 px-3 border-b border-border/50">
+          {!sidebarCollapsed ? (
+            <div className="flex items-center gap-2.5 overflow-hidden">
+              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20 flex items-center justify-center shrink-0"><Wallet className="w-4 h-4 text-primary-foreground" /></div>
+              <span className="text-sm font-semibold tracking-tight">NGXSMK</span>
+            </div>
+          ) : (
+            <div className="mx-auto"><div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-primary/70 shadow-lg shadow-primary/20 flex items-center justify-center"><Wallet className="w-4 h-4 text-primary-foreground" /></div></div>
+          )}
+        </div>
+        <div className="flex-1 overflow-y-auto py-4 px-1.5 space-y-5 scrollbar-thin">
+          {navSections.map((section) => (
+            <div key={section.label ?? "bottom"}>
+              {section.label && !sidebarCollapsed && (
+                <p className="px-2.5 pb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/30 select-none">{section.label}</p>
+              )}
+              {section.items.map((item) => {
+                const Icon = item.icon;
+                const isActive = activePage === item.id;
+                return (
+                  <button key={item.id} onClick={() => setActivePage(item.id)}
+                    onMouseEnter={() => setHoveredItem(item.label)} onMouseLeave={() => setHoveredItem(null)}
+                    className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${sidebarCollapsed ? "justify-center px-0" : ""} ${isActive ? "bg-primary/15 text-primary font-semibold" : "text-muted-foreground/50 hover:text-foreground hover:bg-accent/40"}`}>
+                    {isActive && <span className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-5 rounded-r-full bg-primary" />}
+                    <Icon className="w-5 h-5 shrink-0" />
+                    {!sidebarCollapsed && <span>{item.label}</span>}
+                    {sidebarCollapsed && hoveredItem === item.label && (
+                      <div className="absolute left-full ml-3 top-1/2 -translate-y-1/2 z-50 px-2.5 py-1.5 rounded-lg bg-popover border text-xs font-medium text-popover-foreground shadow-lg whitespace-nowrap pointer-events-none">{item.label}</div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+        <div className="border-t border-border/50 p-1.5 space-y-0.5">
+          <button onClick={() => setActivePage("search")}
+            className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/50 hover:text-foreground hover:bg-accent/40 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+            <Search className="w-5 h-5 shrink-0" />
+            {!sidebarCollapsed && <span className="flex-1 text-left">Search</span>}
+            {!sidebarCollapsed && <kbd className="hidden md:inline-flex items-center gap-1 rounded-md border border-border/40 bg-muted/40 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground/70"><span>⌘</span>K</kbd>}
+          </button>
+          <button
+            className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+            <Lock className="w-5 h-5 shrink-0" />
+            {!sidebarCollapsed && <span>Lock Vault</span>}
+          </button>
+          <button onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+            className={`relative flex items-center gap-3 w-full px-2.5 py-2 rounded-xl text-sm font-medium transition-all text-muted-foreground/40 hover:text-foreground hover:bg-accent/40 ${sidebarCollapsed ? "justify-center px-0" : ""}`}>
+            {sidebarCollapsed ? <ChevronRight className="w-5 h-5" /> : <><ChevronLeft className="w-5 h-5 shrink-0" /><span>Collapse</span></>}
+          </button>
+        </div>
+      </aside>
+      <main className="flex-1 overflow-auto transition-[margin] duration-300 relative" style={{ marginLeft: sidebarCollapsed ? 64 : 240 }}>
+        <header className="sticky top-0 z-20 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+          <div className="flex items-center justify-end h-14 px-6 gap-3">
+            <Badge variant="info" className="gap-1.5 px-3 py-1.5 rounded-lg"><span className="w-1.5 h-1.5 rounded-full bg-green-500" /> Demo Mode</Badge>
+            <button onClick={onToggleDark} className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground">
+              {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <div className="flex items-center gap-2 pl-2 border-l border-border/50">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-500 flex items-center justify-center text-xs font-bold text-white">D</div>
+              <span className="text-sm font-medium hidden sm:block">Demo User</span>
             </div>
           </div>
-        </Section>
-
-        {/* Status & Alerts */}
-        <Section title="Status & Alerts" description="Feedback and notification patterns">
-          <div className="space-y-3">
-            {[
-              { icon: CheckCircle, label: "Success", desc: "Operation completed successfully", color: "text-green-500", bg: "bg-green-500/5 border-green-500/10" },
-              { icon: AlertTriangle, label: "Warning", desc: "Your session will expire soon", color: "text-amber-500", bg: "bg-amber-500/5 border-amber-500/10" },
-              { icon: XCircle, label: "Error", desc: "Failed to authenticate. Please try again.", color: "text-red-500", bg: "bg-red-500/5 border-red-500/10" },
-              { icon: Info, label: "Info", desc: "New update available. Restart to apply.", color: "text-blue-500", bg: "bg-blue-500/5 border-blue-500/10" },
-            ].map((alert, i) => {
-              const AlertIcon = alert.icon;
-              return (
-                <div key={i} className={`flex items-start gap-3 rounded-xl border p-4 ${alert.bg}`}>
-                  <AlertIcon className={`mt-0.5 h-5 w-5 shrink-0 ${alert.color}`} />
-                  <div>
-                    <p className="text-sm font-medium">{alert.label}</p>
-                    <p className="text-xs text-muted-foreground">{alert.desc}</p>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </Section>
-      </motion.div>
+        </header>
+        <div className="p-8 pb-10">
+          <AnimatePresence mode="wait">
+            <motion.div key={activePage} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }} transition={{ duration: 0.2 }}>
+              {renderPage()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+      </main>
     </div>
   );
 }
